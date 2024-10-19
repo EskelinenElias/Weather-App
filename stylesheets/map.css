@@ -1,0 +1,7 @@
+#map {
+    height: 70vh; /* Full height */
+    width: 70vw; /* Full width */
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);  /* Subtle shadow */
+
+}

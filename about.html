@@ -1,0 +1,80 @@
+<!-- sources: see file README.md -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Weather App</title>    
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="stylesheets/header.css">
+        <link rel="stylesheet" href="stylesheets/styles.css">
+        <link rel="stylesheet" href="stylesheets/about.css">
+    </head>
+    <body> 
+        <!-- Backgrounds container -->
+        <div class="background-container">
+            <div class="background background1"></div>
+            <div class="background background2"></div>
+        </div>
+        <!-- Navigation bar -->
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <div class="logo">
+                        <h1><a href="index.html">Weather App</a></h1>
+                    </div>
+                    <div class="nav-items"> 
+                        <button class="nav-button" id="home-button">Home</button>
+                        <button class="nav-button" id="map-button">Map</button>
+                        <form id="search-form" class="search-form">
+                            <input type="text" id="search-input" placeholder="Enter city name" required>
+                                <!--button type="submit">Search</button-->
+                        </form>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <!-- Main content -->
+        <main>
+            <!-- Dropdown menu for checking out the different backgrounds -->
+            <div class="dropdown-container">
+                <h2>Check out the different backgrounds!</h2>
+
+                <select class="dropdown-menu" id="background-select">
+                    <option value="" disabled selected>Select Weather Type</option>
+                    <option value="thunderstorm">Thunderstorm</option>
+                    <option value="drizzle">Drizzle</option>
+                    <option value="rain">Rain</option>
+                    <option value="snow">Snow</option>
+                    <option value="atmosphere">Atmosphere</option>
+                    <option value="clear">Clear</option>
+                    <option value="clouds">Clouds</option>
+                    <option value="hoa hoa hoa">Hoa hoa hoa</option>
+                </select>
+            </div>
+        </main>
+        <!-- Settings button -->
+        <button class="icon-button" id="settings-button">
+            <i class="fas fa-cog"></i>
+        </button>
+        <!-- JavaScripts -->
+        <script src="src/background.js"></script>
+        <script src="src/about.js"></script>    
+        <script>
+          // Add functionality to the home-page button
+          document.getElementById("home-button").addEventListener("click", function() {
+            window.location.href = "index.html";
+          });
+          // Add functionality to the map-page button
+          document.getElementById("map-button").addEventListener("click", () => {
+            window.location.href = "map.html"
+          }); 
+          // Add functionality to the dropdown menu
+          document.getElementById('background-select').addEventListener('change', function() {
+            const weatherType = document.getElementById('background-select').value;
+            manuallyChangeBackground(weatherType); 
+          });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,10 @@
+# ignore server file
+server.*
+root.*
+# ignore old code
+script_old.js
+app copy.js
+legacy
+*week4*
+# ignore code editor settings
+.zed

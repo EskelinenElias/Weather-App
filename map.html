@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Location</title>
+    <!-- add script and stylesheet -->
+    <!--<script src="src/app.js" defer></script>-->
+    <!--<script src="src/background.js" defer></script>-->
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/weather.css">
+    <link rel="stylesheet" href="stylesheets/header.css">
+    <link rel="stylesheet" href="stylesheets/map.css">
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Backgrounds container -->
+    <div class="background-container">
+        <div class="background background1"></div>
+        <div class="background background2"></div>
+    </div>
+    <!-- Navigation bar -->
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <h1><a href="index.html">Weather App</a></h1>
+                </div>
+                <div class="nav-items"> 
+                    <button class="nav-button" id="home-button">Home</button>
+                    <button class="nav-button" id="about-button">About</button>
+                    <form id="search-form" class="search-form">
+                        <input type="text" id="search-input" placeholder="Enter city name" required>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- Main content -->
+    <main>
+        <div id="map"></div> 
+    </main>    
+    <!-- Settings button -->
+    <button class="icon-button" id="settings-button">
+        <i class="fas fa-cog"></i>
+    </button>
+    <!-- Locate button -->
+    <button class="icon-button" id="locate-button">
+        <i class="fas fa-location-arrow"></i>
+    </button>
+    <!-- JavaScripts -->
+    <script src="src/background.js"></script>
+    <script src="src/weather.js"></script>
+    <script src="src/geolocation.js"></script>
+    <script src="src/map.js"></script>
+    <script>
+    // Add functionality to the home-page button
+    document.getElementById("home-button").addEventListener("click", function() {
+      window.location.href = "index.html";
+    });
+    // Add functionality to the about-page button
+    document.getElementById("about-button").addEventListener("click", function() {
+      window.location.href = "about.html";
+    });
+    // Add functionality to the locate button
+    document.getElementById("locate-button").addEventListener("click", function() {
+      // Locate the user
+      getLocation().then((locationData) => {
+        if (!locationData) { 
+          alert("Could not get your location.")
+          return; 
+        }
+        // Get weather data for the user's location
+        getWeatherDataForLocation(locationData).then((weatherData) => {
+          if (!weatherData) { 
+            alert("Could not get weather data for your location.")
+            return; 
+          }
+          // Change map location and match the background to the weather
+          changeMapLocation(weatherData); 
+          changeBackgroundAccordingToWeather(weatherData); 
+          // Save weather data for later use
+          setExistingWeatherData(weatherData); 
+        }); 
+      }).catch((error) => {
+        console.log(error); 
+      }); 
+    }); 
+    // Add functionality to the search bar
+    document.getElementById("search-form").addEventListener("submit", () => {
+      event.preventDefault(); 
+      const locationName = document.getElementById("search-input").value.trim().toLowerCase();
+      getWeatherByLocationName(locationName).then((weatherData) => {
+        if (!weatherData) {
+          alert(`Could get weather data for ${locationName}.`)
+          return; 
+        }
+        // Update map location and match the background tot the weather
+        changeMapLocation(weatherData);  
+        changeBackgroundAccordingToWeather(weatherData); 
+        // Save weather data for later use
+        setExistingWeatherData(weatherData);
+      }); 
+    });
+    </script>
+</body>
+</html>

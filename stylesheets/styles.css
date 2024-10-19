@@ -1,0 +1,144 @@
+:root {
+    --header-text-color: rgba(255, 255, 255, 0.9);
+    --info-text-color: rgba(255, 255, 255, 0.9);
+    --search-form-background-color: rgba(255, 255, 255, 0.2);
+    --search-form-background-color-hover: rgba(255, 255, 255, 0.3); 
+    --search-form-placeholder-color: rgba(255, 255, 255, 0.6); 
+    --elements-transition: none; 
+    --search-form-transition: none; 
+    --backgrounds-transition: none; 
+}
+
+html, body {
+    height: 100%; 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; 
+}
+
+body {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 100vh; 
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    position: relative; 
+    z-index: 1; 
+    background: none; 
+    background-image: 'linear-gradient(to right, #87ceeb, #1e90ff)'; 
+}
+
+main {
+    flex: 1 0 auto; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    z-index: 2; 
+}
+
+.icon-button {
+    border: none;
+    background: none;
+    color: var(--header-text-color);
+    opacity: 0.8; 
+    font-size: 30px;
+    cursor: pointer;
+    outline: none;
+    padding: 0; 
+    z-index: 2; 
+    transition: var(--elements-transition); 
+}
+
+#locate-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+
+#settings-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+}
+
+.icon-button i {
+    transition: color 0.3s ease; 
+}
+
+.icon-button:hover i {
+    color: gray; 
+}
+
+.background-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; 
+    overflow: hidden;
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: var(--backgrounds-transition);
+    opacity: 0;
+    background-repeat: no-repeat;
+
+}
+
+.background1 {
+    background-image: linear-gradient(to right, #87ceeb, #1e90ff);
+    opacity: 1; 
+}
+
+.background2 {
+    background-image: linear-gradient(to right, #87ceeb, #1e90ff);
+    opacity: 0; 
+}
+
+.dropdown-container {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--header-text-color); 
+    transition: var(--elements-transition); 
+}
+
+.dropdown-container h2 {
+    color: var(--header-text-color); 
+    transition: var(--elements-transition); 
+}
+
+.dropdown-menu {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid var(--header-text-color); 
+    border-radius: 5px; 
+    background-color: var(--search-form-background-color); 
+    color: var(--search-form-placeholder-color); 
+    /*appearance: none; */
+    transition: var(--elements-transition);
+    outline: none; 
+    cursor: pointer; 
+}
+
+.dropdown-menu:hover {
+    background-color: var(--search-form-background-color-hover); 
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dropdown-menu:focus {;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}

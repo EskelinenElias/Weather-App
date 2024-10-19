@@ -1,0 +1,47 @@
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+main h1 {
+    color: var(--header-text-color); 
+    transition: var(--elements-transition); 
+}
+
+.dropdown-container {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--header-text-color); 
+    transition: var(--elements-transition); 
+}
+
+.dropdown-container h2 {
+    color: var(--header-text-color); 
+    transition: var(--elements-transition); 
+}
+
+#background-select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid var(--header-text-color); 
+    border-radius: 5px; 
+    background-color: var(--search-form-background-color); 
+    color: var(--search-form-placeholder-color); 
+    /*appearance: none; */
+    transition: var(--elements-transition);
+    outline: none; 
+    cursor: pointer; 
+}
+
+#background-select:hover {
+    background-color: var(--search-form-background-color-hover); 
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#background-select:focus {;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}

@@ -1,0 +1,55 @@
+#weather-container {
+    margin-top: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#weather-main {
+    margin: 0;
+    padding: 0; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--info-text-color); 
+    transition: var(--elements-transition); 
+}
+
+#city-name {
+    font-size: 3rem; 
+    opacity: 0.95; 
+    margin: 0.5rem 0; 
+    
+}
+
+#temp-display {
+    font-size: 6rem; 
+    opacity: 0.95; 
+    margin: 0.5rem 0; 
+}
+
+#weather-icon {
+    margin: 0 2.5rem 0 0; 
+    opacity: 0.80; 
+}
+
+#weather-description {
+    display: flex;
+    align-items: center; 
+    justify-content: flex-start;
+}
+
+#weather-description-text {
+    font-size: 2rem;
+    opacity: 0.95; 
+    margin: 0.5rem 0; 
+}
+
+#feels-like, #humidity, #pressure {
+    font-size: 1.5rem;
+    opacity: 0.95; 
+    margin: 0.3rem 0; 
+}
