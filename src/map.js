@@ -26,37 +26,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const longitude = weatherData.coord.lon;
     // Initialize map
     map = L.map('map').setView([latitude, longitude], 13);
-    // Add map
+    // Add basemap
     const mapLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors & CartoDB'
     })
-    // Add clouds
+    // Add clouds layer
     const cloudsLayer = L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Clouds data © OpenWeatherMap'
     });
-    // Add rain
+    // Add rain layer
     const precipitationLayer = L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Precipitation data © OpenWeatherMap'
     });
-    // Add temperature
-    const tempLayer = L.tileLayer(`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
+    // Add temperature layer
+    const temperatureLayer = L.tileLayer(`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Temperature data © OpenWeatherMap'
     });
-    // Add wind
+    // Add wind layer
     const windLayer = L.tileLayer(`https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Wind data © OpenWeatherMap'
     });
-    // Add pressure
+    // Add pressure layer
     const pressureLayer = L.tileLayer(`https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Pressure data © OpenWeatherMap'
     });
-    // Add snow
+    // Add snow layer
     const snowLayer = L.tileLayer(`https://tile.openweathermap.org/map/snow_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Snow data © OpenWeatherMap'
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     L.control.layers({
       "Clouds": cloudsLayer,
       "Precipitation": precipitationLayer,
-      "Temperature": tempLayer,
+      "Temperature": temperatureLayer,
       "Wind": windLayer,
       "Pressure": pressureLayer,
       "Snow": snowLayer
