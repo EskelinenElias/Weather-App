@@ -134,7 +134,7 @@
                 alert("Could not get weather data for current location.")
                 return; 
               }
-              document.getElementById("forecasts-header").innerText = `Forecasts for ${weatherData.name}`;
+              document.getElementById("forecasts-header").innerText = capitalizeFirstLetter(`Forecasts for ${weatherData.name}`);
               // Display weather data and update background to match the weather
               displayWeatherData(weatherData); 
               changeBackgroundAccordingToWeather(weatherData); 
@@ -142,6 +142,16 @@
               setExistingWeatherData(weatherData); 
             });
           });
+          
+          // Function for capitalizing the first letter of a string
+          function capitalizeFirstLetter(string) {
+            if (string.length == 1) {  
+              string = string.charAt(0).toUpperCase(); 
+            } else if (string.length > 1) {
+              string = string.charAt(0).toUpperCase() + string.slice(1); 
+            }
+            return string;
+          }
           
           // Add functionality to the mobile search bar
           document.getElementById("search-form-mobile").addEventListener("submit", async (event) => {
@@ -156,7 +166,7 @@
                 console.log(`Could not get weather data for search ${locationData.name}`)
                 return; 
               }
-              document.getElementById("forecasts-header").innerText = `Forecasts for ${locationData.name}`;
+              document.getElementById("forecasts-header").innerText = capitalizeFirstLetter(`Forecasts for ${locationData.name}`);
               setExistingWeatherData(weatherData); 
               changeBackgroundAccordingToWeather(weatherData); 
             }).then((locationData) => {
@@ -208,7 +218,6 @@
               return locationData; 
             }).then((locationData) => {
               // Get forecast data
-              console.log("units", units)
               getHourlyForecastData(locationData, 24, units).then((forecastData) => {
                 if (!forecastData) {
                   alert(`Could not get forecast data for search ${locationData.name}`)

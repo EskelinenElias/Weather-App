@@ -144,7 +144,7 @@ async function getOtherHourlyForecast(locationData, days, units) {
   // Choose units
   const unit = chooseUnitsOther(units); 
   // Construct URL
-  const url = `http://api.weatherapi.com/v1/forecast.json?key=${WeatherAPIKey}&${location}&days=${days}`
+  const url = `http://api.weatherapi.com/v1/forecast.json?key=${WeatherAPIKey}&${location}&days=${days}&units=${unit}`
   // Fetch forecast data    const data = await response.json();
   return fetch(url).then((response) => {
     if (!response.ok) { throw new Error('Failed to fetch hourly forecast data from Weather API.'); }

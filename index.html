@@ -148,7 +148,7 @@
             const locationData = { name: document.getElementById("search-input-mobile").value };  
             const settings = await getSettings();
             // Get weather data
-            getWeatherData(locationName, settings.units).then((weatherData) => {
+            getWeatherData(locationData, settings.units).then((weatherData) => {
               if (!weatherData) {
                 alert(`Could not get weather data for search ${locationData.name}.`); 
                 console.log(`Could not get weather data for search ${locationData.name}.`); 

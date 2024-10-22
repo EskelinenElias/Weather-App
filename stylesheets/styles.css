@@ -10,6 +10,7 @@
     --overflow-menu-background-color: rgba(255, 255, 255, 0.8);
     --overflow-menu-text-color: rgba(0, 0, 0, 0.8);
     --overflow-menu-text-color-hover: rgba(0, 0, 0, 1);
+    --chart-line-color: #FFFFFF; 
 }
 
 html, body {

@@ -29,6 +29,7 @@ async function changeElementColor(color) {
     document.documentElement.style.setProperty('--overflow-menu-background-color', 'rgba(0, 0, 0, 0.8)');
     document.documentElement.style.setProperty('--overflow-menu-text-color', 'rgba(255, 255, 255, 0.8)');
     document.documentElement.style.setProperty('--overflow-menu-text-color-hover', 'rgba(255, 255, 255, 1)');
+    document.documentElement.style.setProperty('--chart-line-color', '#000000');
   } else { // Color is probably white
     document.documentElement.style.setProperty('--header-text-color', 'rgba(255, 255, 255, 0.85)');
     document.documentElement.style.setProperty('--info-text-color', 'rgba(255, 255, 255, 0.9)');
@@ -38,6 +39,7 @@ async function changeElementColor(color) {
     document.documentElement.style.setProperty('--overflow-menu-background-color', 'rgba(255, 255, 255, 0.8)');
     document.documentElement.style.setProperty('--overflow-menu-text-color', 'rgba(0, 0, 0, 0.8)');
     document.documentElement.style.setProperty('--overflow-menu-text-color-hover', 'rgba(0, 0, 0, 1)');
+    document.documentElement.style.setProperty('--chart-line-color', '#FFFFFF');
   }
 }
 
@@ -48,12 +50,8 @@ function isNightTime(weatherData) {
   // Parse weather data
   const sunriseData = weatherData.sys.sunrise; 
   const sunsetData = weatherData.sys.sunset; 
-  const timezoneOffset = weatherData.timezone; 
-  // Take timezones into consideration
-  const localSunrise = sunriseData + timezoneOffset; 
-  const localSunset = sunsetData + timezoneOffset; 
   // Check whether it is nighttime or daytime
-  if (currentTime < localSunrise || currentTime > localSunset) {
+  if (currentTime < sunriseData || currentTime > sunsetData) {
     return true; 
   } else {
     return false;

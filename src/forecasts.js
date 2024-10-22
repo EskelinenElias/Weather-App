@@ -168,21 +168,19 @@ function create24HourForecastForPlot(forecastData, units) {
 
 function plot24HourForecast(data, units) {
   if (!data) { throw new Error("Chart data was not provided."); }
-  const color = document.documentElement.style.getPropertyValue('--info-text-color').trim();
+  const color = document.documentElement.style.getPropertyValue('--chart-line-color');
   // Create a new Frappe chart 
   chart = new frappe.Chart("#temp-chart", {
     title: "Temperature forecast for the next 24 hours",
     data: data,
     type: 'line',
-    height: 500,
-    colors: [color, color], 
+    height: 450,
+    colors: [color], 
     axisOptions: {
       xAxisMode: 'tick', 
       yAxisMode: 'span',
-      xIsSeries: true 
     },
     lineOptions: {
-      regionFill: false, 
       strokeWidth: 2, 
       hideDots: 1, 
       heatline: 1 
@@ -225,7 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!weatherData) { 
       throw new Error("Could not get relevant weather data.")
     }
-    document.getElementById("forecasts-header").innerText = `Forecasts for ${weatherData.name}`;
+    document.getElementById("forecasts-header").innerText = capitalizeFirstLetter(`Forecasts for ${weatherData.name}`);
     return weatherData;
   }).then((locationData) => {
     // Load fresh weather data
