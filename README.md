@@ -1,5 +1,7 @@
 # Weather-App
 
+For project report, see file the folder 'report'.
+
 Description: 
 
 22.10.2024
