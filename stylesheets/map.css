@@ -1,7 +1,48 @@
 #map {
-    height: 70vh; /* Full height */
-    width: 70vw; /* Full width */
     border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);  /* Subtle shadow */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);  
+}
 
+.main {
+    display: flex; 
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    width: 100vw; 
+    height: 100vh;
+}
+
+.map-container {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    width: 70%; 
+    height: 80%;
+}
+
+h1 {
+    color: var(--header-text-color); 
+    transition: var(--elements-transition);
+}
+
+@media only screen and (min-width: 601px) {
+    #map {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        box-sizing: border-box;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #map {
+        width: calc(100vw - 40px); 
+        padding: 0 20px; 
+        height: 70vh; 
+        display: flex;
+        box-sizing: border-box;
+    }
 }

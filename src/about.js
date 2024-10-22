@@ -1,4 +1,5 @@
-function manuallyChangeBackground(weatherType) {
+// Function for demoing the different backgrounds
+function manuallyChangeBackground(weatherType, night) {
   // Match the weather type to a weather code
   console.log(`Changing the background to match ${weatherType}.`)
   let weatherCode;
@@ -26,6 +27,5 @@ function manuallyChangeBackground(weatherType) {
     weather: [{id: weatherCode}]
   }
   // Change the background using the weather data
-  changeBackgroundAccordingToWeather(weatherData);
+  changeBackgroundAccordingToWeather(weatherData, night);
 }
-

@@ -1,15 +1,19 @@
-<!-- sources: see file README.md -->
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Weather App</title>    
+        <!-- JavaScripts -->
+        <script src="src/weather.js"></script>
+        <script src="src/settings.js"></script>
+        <script src="src/header.js"></script>
         <!-- Stylesheets -->
         <link rel="stylesheet" href="stylesheets/header.css">
         <link rel="stylesheet" href="stylesheets/styles.css">
         <link rel="stylesheet" href="stylesheets/settings.css">
+        <!-- Font Awesome icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     </head>
     <body> 
         <!-- Backgrounds container -->
@@ -25,30 +29,54 @@
                         <h1><a href="index.html">Weather App</a></h1>
                     </div>
                     <div class="nav-items"> 
+                        <!-- Navigation and search for desktop -->
                         <button class="nav-button" id="home-button">Home</button>
+                        <button class="nav-button" id="forecasts-button">Forecasts</button>
                         <button class="nav-button" id="map-button">Map</button>
                         <button class="nav-button" id="about-button">About</button>
                         <form id="search-form" class="search-form">
                             <input type="text" id="search-input" placeholder="Enter city name" required>
-                                <!--button type="submit">Search</button-->
                         </form>
+                        <!-- Search icon and overflow menu icon for mobile -->
+                        <button class="icon-button" id="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="icon-button" id="overflow-menu">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
                     </div>
                 </div>
             </nav>
+            <!-- Hidden search bar for mobile -->
+            <form id="search-form-mobile" class="search-form">
+                <input type="text" id="search-input-mobile" placeholder="Enter city name" required>
+            </form>
+            <!-- Hidden overflow menu for mobile -->
+            <div class="overflow-menu-dropdown" id="overflow-menu-dropdown">
+                <button class="nav-button" id="dropdown-home-button">Home</button>
+                <button class="nav-button" id="dropdown-forecasts-button">Forecasts</button>
+                <button class="nav-button" id="dropdown-map-button">Map</button>
+                <button class="nav-button" id="dropdown-about-button">About</button>
+            </div>
         </header>
         <!-- Main content -->
         <main>
             <h1>Settings</h1>
             <!-- Dropdown menu for checking out the different backgrounds -->
+            <h2>Select units:</h2>
+
             <div class="dropdown-container">
-                <h2>Select units:</h2>
                 <select class="dropdown-menu" id="units-select">
                     <option value=""disabled selected>Select Units</option>
-                    <option value="celsius">°C</option>
-                    <option value="fahrenheit">°F</option>
+                    <option value="metric">Metric</option>
+                    <option value="imperial">Imperial</option>
                 </select>
             </div>
         </main>
+        <!-- Locate button -->
+        <button class="icon-button" id="locate-button">
+            <i class="fas fa-location-arrow"></i>
+        </button>
         <!-- JavaScripts -->
         <script src="src/background.js"></script>
         <script src="src/about.js"></script> 
@@ -58,16 +86,128 @@
           document.getElementById("home-button").addEventListener("click", function() {
             window.location.href = "index.html";
           });
+          // Add functionality to the forecasts-page button
+          document.getElementById("forecasts-button").addEventListener("click", () => {
+            window.location.href = "forecasts.html"
+          }); 
           // Add functionality to the map-page button
           document.getElementById("map-button").addEventListener("click", () => {
             window.location.href = "map.html"
           }); 
+          // Add functionality to the about-page button
+          document.getElementById("about-button").addEventListener("click", () => {
+            window.location.href = "about.html"
+          }); 
+          // Add functionality to the overflow menu home-page button
+          document.getElementById("dropdown-home-button").addEventListener("click", function() {
+            window.location.href = "index.html";
+          });
+          // Add functionality to the forecasts-page button
+          document.getElementById("dropdown-forecasts-button").addEventListener("click", () => {
+            window.location.href = "forecasts.html"
+          }); 
+          // Add functionality to the overflow menu map-page button
+          document.getElementById("dropdown-map-button").addEventListener("click", function() {
+            window.location.href = "map.html";
+          });
+          // Add functionality to the overflow menu about-page button
+          document.getElementById("dropdown-about-button").addEventListener("click", function() {
+            window.location.href = "about.html";
+          });
+          
           // Add functionality to the dropdown menu
-          document.getElementById('units-select').addEventListener('change', function() {
+          const dropdownMenu = document.getElementById('units-select'); 
+          dropdownMenu.addEventListener('change', function() {
             const units = document.getElementById('units-select').value;
             setSettings(units);
           });
-        
+          
+          // Set the dropdown menu item according to settings
+          getSettings().then((settings) => {
+            if (settings.units === "imperial") {
+              dropdownMenu.selectedIndex = 2; 
+            } else {
+              dropdownMenu.selectedIndex = 1; 
+            }
+          });
+          
+          // Add functionality to the locate button
+          document.getElementById("locate-button").addEventListener('click', () => {
+            event.preventDefault(); 
+            // Animate locate button during locating
+            const locateIcon = document.querySelector("#locate-button i");
+            locateIcon.classList.add("pulse-animation");
+            // Get weather data for the current location
+            getWeatherDataForCurrentLocation().then((weatherData) => {
+              if (!weatherData) {
+                alert("Could not get weather data for current location.")
+                console.log("Could not get weather data for current location.")
+                // Stop animation
+                locateIcon.classList.remove("pulse-animation");
+                return; 
+              }
+              // Stop animation
+              locateIcon.classList.remove("pulse-animation");
+              // Display weather data and update background to match the weather
+              changeBackgroundAccordingToWeather(weatherData); 
+              // Save weather data for later use
+              setExistingWeatherData(weatherData);
+              // Go to home page to display the data
+              window.location.href = "index.html"; 
+            }).catch((error) => {
+              alert("Could not get weather data for current location.")
+              console.log("An error occurred while attempting to fetch weather data for current location")
+              locateIcon.classList.remove("pulse-animation");
+            });
+          });
+          
+          // Add functionality to the search bar
+          document.getElementById("search-form").addEventListener("submit", async () => {
+            event.preventDefault();
+            // Prepare location data and get settings
+            const locationData = { name: document.getElementById("search-input").value };
+            const settings = await getSettings(); 
+            const units = settings.units; 
+            // Get weather data
+            getWeatherData(locationData, units).then((weatherData) => {
+              if (!weatherData) {
+                alert(`Could not get weather data for search ${locationData.name}.`);
+                console.log(`Could not get weather data for search ${locationData.name}.`);
+                return; 
+              }
+              // Change background style
+              changeBackgroundAccordingToWeather(weatherData);
+              // Store weather data for later use
+              setExistingWeatherData(weatherData);
+              // Go to home page to display the data
+              window.location.href = "index.html";
+            });
+          });
+          
+          // Add functionality to the mobile search bar
+          document.getElementById("search-form-mobile").addEventListener("submit", async (event) => {
+            event.preventDefault(); 
+            // Construct location data and get units
+            const locationData = { name: document.getElementById("search-input-mobile").value };  
+            const settings = await getSettings();
+            // Get weather data
+            getWeatherData(locationData, settings.units).then((weatherData) => {
+              if (!weatherData) {
+                alert(`Could not get weather data for search ${locationData.name}.`); 
+                console.log(`Could not get weather data for search ${locationData.name}.`); 
+                return; 
+              }
+              // Populate page with weather data and change background accordingly
+              changeBackgroundAccordingToWeather(weatherData); 
+              // Store weather data for later use
+              setExistingWeatherData(weatherData);
+              // Show results
+              document.getElementById("search-form-mobile").classList.remove("open"); 
+              document.querySelector('main').classList.remove("hidden"); 
+              // Go to homepage
+              window.location.href = "index.html";
+            }); 
+          });
         </script>
     </body>
 </html>

@@ -4,7 +4,14 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Weather App</title>
-        <!-- Stylesheet -->
+        <!-- JavaScripts -->
+        <script src="src/settings.js"></script>
+        <script src="src/header.js"></script>
+        <script src="src/geolocation.js"></script>
+        <script src="src/background.js"></script>
+        <script src="src/weather.js"></script>
+        <script src="src/app.js"></script>
+        <!-- Stylesheets -->
         <link rel="stylesheet" href="stylesheets/styles.css">
         <link rel="stylesheet" href="stylesheets/header.css">
         <link rel="stylesheet" href="stylesheets/weather.css">
@@ -25,18 +32,39 @@
                         <h1><a href="index.html">Weather App</a></h1>
                     </div>
                     <div class="nav-items"> 
+                        <!-- Navigation and search for desktop -->
+                        <button class="nav-button" id="forecasts-button">Forecasts</button>
                         <button class="nav-button" id="map-button">Map</button>
                         <button class="nav-button" id="about-button">About</button>
                         <form id="search-form" class="search-form">
                             <input type="text" id="search-input" placeholder="Enter city name" required>
                         </form>
+                        <!-- Search icon and overflow menu icon for mobile -->
+                        <button class="icon-button" id="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="icon-button" id="overflow-menu">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        
                     </div>
                 </div>
             </nav>
+            <!-- Hidden search bar for mobile -->
+            <form id="search-form-mobile" class="search-form">
+                <input type="text" id="search-input-mobile" placeholder="Enter city name" required>
+            </form>
+            <!-- Hidden overflow menu for mobile -->
+            <div class="overflow-menu-dropdown" id="overflow-menu-dropdown">
+                <button class="nav-button" id="dropdown-forecasts-button">Forecasts</button>
+                <button class="nav-button" id="dropdown-map-button">Map</button>
+                <button class="nav-button" id="dropdown-about-button">About</button>
+            </div>
         </header>
+        <!-- Main content -->
         <main>
             <div class="weather-main" id="weather-main"></div>
-            <!--<div id="weather-container"></div>-->
+            <div class="forecast-container" id="hourly-forecast-container" ></div>
         </main>
         <!-- Settings button -->
         <button class="icon-button" id="settings-button">
@@ -46,62 +74,115 @@
         <button class="icon-button" id="locate-button">
             <i class="fas fa-location-arrow"></i>
         </button>
-        <!-- JavaScripts -->
-        <script src="src/geolocation.js"></script>
-        <script src="src/background.js"></script>
-        <script src="src/weather.js"></script>
-        <script src="src/app.js"></script>
+        <!-- Page specific JavaScripts -->
         <script>
+        
+          // Add functionality to the about-page button
+          document.getElementById("forecasts-button").addEventListener("click", function() {
+            window.location.href = "forecasts.html";
+          });
+          
           // Add functionality to the about-page button
           document.getElementById("about-button").addEventListener("click", function() {
             window.location.href = "about.html";
           });
+          
           // Add functionality to the map-page button
           document.getElementById("map-button").addEventListener("click", function() {
             window.location.href = "map.html";
           });
-          // Add functionality to the search bar
-          document.getElementById("search-form").addEventListener("submit", function() {
-            event.preventDefault(); 
-            const locationName = document.getElementById("search-input").value; 
-            getWeatherByLocationName(locationName).then((weatherData) => {
-              if (weatherData) {
-                setExistingWeatherData(weatherData); 
-                displayWeatherData(weatherData); 
-                changeBackgroundAccordingToWeather(weatherData); 
-              }
-            }); 
+          
+          // Add functionality to the overflow menu forecasts-page button
+          document.getElementById("dropdown-forecasts-button").addEventListener("click", function() {
+            window.location.href = "forecasts.html";
           });
+          
+          // Add functionality to the overflow menu home-page button
+          document.getElementById("dropdown-map-button").addEventListener("click", function() {
+            window.location.href = "map.html";
+          });
+          
+          // Add functionality to the overflow menu about-page button
+          document.getElementById("dropdown-about-button").addEventListener("click", function() {
+            window.location.href = "about.html";
+          });
+          
+          // Add functionality to the settings button
           document.getElementById("settings-button").addEventListener('click', () => {
             window.location.href = "settings.html";
           });
+          
           // Add functionality to the locate button
-          document.getElementById("locate-button").addEventListener('click', () => {
+          document.getElementById("locate-button").addEventListener('click', async () => {
             event.preventDefault(); 
-            console.log("Locating user...")
-            getLocation().then((locationData) => {
-              if (!locationData) {
-                alert("Could not locate.")
+            // Get settings
+            const settings = await getSettings(); 
+            // Animate locate button during locating
+            const locateIcon = document.querySelector("#locate-button i"); // Select the icon inside the button
+            locateIcon.classList.add("pulse-animation");
+            // Get weather data for the current location
+            getWeatherDataForCurrentLocation(settings.units).then((weatherData) => {
+              if (!weatherData) {
+                alert("Could not get weather data for current location.")
+                console.log("Could not get weather data for current location.")
                 return; 
               }
-              console.log("Getting weather data for location...")
-              getWeatherDataForLocation(locationData).then((weatherData) => {
-                if (!weatherData) {
-                  alert("Could not get weather data for current location.")
-                  return; 
-                }
-                console.log(weatherData); 
-                // Display weather data and update background to match the weather
-                displayWeatherData(weatherData); 
-                changeBackgroundAccordingToWeather(weatherData); 
-                // Save weather data for later use
-                const locationData = {
-                  latitude: weatherData.coord.latitude,
-                  longitude: weatherData.coord.longitude
-                }
-                setExistingLocationData(locationData); 
-                setExistingWeatherData(weatherData); 
-              });
+              // Stop animation
+              locateIcon.classList.remove("pulse-animation");
+              // Display weather data and update background to match the weather
+              displayWeatherData(weatherData); 
+              changeBackgroundAccordingToWeather(weatherData); 
+              // Save weather data for later use
+              setExistingWeatherData(weatherData); 
+            }).catch((error) => {
+              alert("Could not get weather data for current location.")
+              console.log("An error occurred while attempting to fetch weather data for current location")
+              locateIcon.classList.remove("pulse-animation");
+            });
+          });
+          
+          // Add functionality to the mobile search bar
+          document.getElementById("search-form-mobile").addEventListener("submit", async (event) => {
+            event.preventDefault(); 
+            // Construct location data and get units
+            const locationData = { name: document.getElementById("search-input-mobile").value };  
+            const settings = await getSettings();
+            // Get weather data
+            getWeatherData(locationName, settings.units).then((weatherData) => {
+              if (!weatherData) {
+                alert(`Could not get weather data for search ${locationData.name}.`); 
+                console.log(`Could not get weather data for search ${locationData.name}.`); 
+                return; 
+              }
+              // Populate page with weather data and change background accordingly
+              displayWeatherData(weatherData); 
+              changeBackgroundAccordingToWeather(weatherData); 
+              // Store weather data for later use
+              setExistingWeatherData(weatherData);
+            }); 
+            // Show results
+            document.getElementById("search-form-mobile").classList.remove("open"); 
+            document.querySelector('main').classList.remove("hidden"); 
+          });
+          
+          // Add functionality to the desktop search bar
+          document.getElementById("search-form").addEventListener("submit", async (event) => {
+            event.preventDefault(); 
+            // Get location data and units
+            const locationData = {name: document.getElementById("search-input").value }; 
+            const settings = await getSettings(); 
+            // Get weather data
+            getWeatherData(locationData, settings.units).then((weatherData) => {
+              if (!weatherData) {
+                alert(`Could not get weather data for search ${locationData.name}.`); 
+                console.log(`Could not get weather data for search ${locationData.name}.`); 
+                return; 
+              }
+              // Populate page with weather data and change background accordingly
+              displayWeatherData(weatherData); 
+              changeBackgroundAccordingToWeather(weatherData); 
+              // Store weather data for later use
+              setExistingWeatherData(weatherData); 
             }); 
           });
         </script>

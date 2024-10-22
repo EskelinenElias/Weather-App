@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map Location</title>
     <!-- add script and stylesheet -->
-    <!--<script src="src/app.js" defer></script>-->
+    <script src="src/settings.js"></script>
+    <script src="src/header.js"></script>
+    <script src="src/background.js"></script>
+    <script src="src/weather.js"></script>
+    <script src="src/geolocation.js"></script>
+    <script src="src/map.js"></script>
     <!--<script src="src/background.js" defer></script>-->
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/weather.css">
@@ -32,18 +37,41 @@
                     <h1><a href="index.html">Weather App</a></h1>
                 </div>
                 <div class="nav-items"> 
+                    <!-- Navigation and search for desktop -->
                     <button class="nav-button" id="home-button">Home</button>
+                    <button class="nav-button" id="forecasts-button">Forecasts</button>
                     <button class="nav-button" id="about-button">About</button>
                     <form id="search-form" class="search-form">
                         <input type="text" id="search-input" placeholder="Enter city name" required>
                     </form>
+                    <!-- Search icon and overflow menu icon for mobile -->
+                    <button class="icon-button" id="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="icon-button" id="overflow-menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    
                 </div>
             </div>
         </nav>
+        <!-- Hidden search bar for mobile -->
+        <form id="search-form-mobile" class="search-form">
+            <input type="text" id="search-input-mobile" placeholder="Enter city name" required>
+        </form>
+        <!-- Hidden overflow menu for mobile -->
+        <div class="overflow-menu-dropdown" id="overflow-menu-dropdown">
+            <button class="nav-button" id="dropdown-home-button">Home</button>
+            <button class="nav-button" id="dropdown-forecasts-button">Forecasts</button>
+            <button class="nav-button" id="dropdown-about-button">About</button>
+        </div>
     </header>
     <!-- Main content -->
     <main>
-        <div id="map"></div> 
+        <div class="map-container" id="map-container">
+            <h1>Weather map</h1>
+            <div id="map"></div> 
+        </div>
     </main>    
     <!-- Settings button -->
     <button class="icon-button" id="settings-button">
@@ -53,32 +81,49 @@
     <button class="icon-button" id="locate-button">
         <i class="fas fa-location-arrow"></i>
     </button>
-    <!-- JavaScripts -->
-    <script src="src/background.js"></script>
-    <script src="src/weather.js"></script>
-    <script src="src/geolocation.js"></script>
-    <script src="src/map.js"></script>
     <script>
-    // Add functionality to the home-page button
-    document.getElementById("home-button").addEventListener("click", function() {
-      window.location.href = "index.html";
-    });
-    // Add functionality to the about-page button
-    document.getElementById("about-button").addEventListener("click", function() {
-      window.location.href = "about.html";
-    });
-    // Add functionality to the locate button
-    document.getElementById("locate-button").addEventListener("click", function() {
-      // Locate the user
-      getLocation().then((locationData) => {
-        if (!locationData) { 
-          alert("Could not get your location.")
-          return; 
-        }
-        // Get weather data for the user's location
-        getWeatherDataForLocation(locationData).then((weatherData) => {
+      // Add functionality to the home-page button
+      document.getElementById("home-button").addEventListener("click", function() {
+        window.location.href = "index.html";
+      });
+      
+      // Add functionality to the forecasts-page button
+      document.getElementById("forecasts-button").addEventListener("click", function() {
+        window.location.href = "forecasts.html";
+      });
+      
+      // Add functionality to the about-page button
+      document.getElementById("about-button").addEventListener("click", function() {
+        window.location.href = "about.html";
+      });
+      
+      // Add functionality to the overflow menu home-page button
+      document.getElementById("dropdown-home-button").addEventListener("click", function() {
+        window.location.href = "index.html";
+      });
+      
+      // Add functionality to the overflow menu forecasts-page button
+      document.getElementById("dropdown-forecasts-button").addEventListener("click", function() {
+        window.location.href = "forecasts.html";
+      });
+      
+      // Add functionality to the overflow menu about-page button
+      document.getElementById("dropdown-about-button").addEventListener("click", function() {
+        window.location.href = "about.html";
+      });
+      
+      // Add functionality to the settings button
+      document.getElementById("settings-button").addEventListener("click", function() {
+        window.location.href = "settings.html";
+      });
+      
+      // Add functionality to the locate button
+      document.getElementById("locate-button").addEventListener("click", function() {
+        // Locate the user
+        getWeatherDataForCurrentLocation().then((weatherData) => {
           if (!weatherData) { 
-            alert("Could not get weather data for your location.")
+            alert("Could not get weather data for your location.");
+            console.log("Could not get weather data for your location.");
             return; 
           }
           // Change map location and match the background to the weather
@@ -86,27 +131,61 @@
           changeBackgroundAccordingToWeather(weatherData); 
           // Save weather data for later use
           setExistingWeatherData(weatherData); 
+        }).catch((error) => {
+          alert("Could not get weather data for your location.");
+          console.log("An error occurred while attempting to get weather data for current location", error);
         }); 
-      }).catch((error) => {
-        console.log(error); 
       }); 
-    }); 
-    // Add functionality to the search bar
-    document.getElementById("search-form").addEventListener("submit", () => {
-      event.preventDefault(); 
-      const locationName = document.getElementById("search-input").value.trim().toLowerCase();
-      getWeatherByLocationName(locationName).then((weatherData) => {
-        if (!weatherData) {
-          alert(`Could get weather data for ${locationName}.`)
-          return; 
-        }
-        // Update map location and match the background tot the weather
-        changeMapLocation(weatherData);  
-        changeBackgroundAccordingToWeather(weatherData); 
-        // Save weather data for later use
-        setExistingWeatherData(weatherData);
-      }); 
-    });
+      
+      // Add functionality to the search bar
+      document.getElementById("search-form").addEventListener("submit", async (event) => {
+        event.preventDefault(); 
+        const locationData = { name: document.getElementById("search-input").value.trim().toLowerCase() };
+        const settings = await getSettings(); 
+        const units = settings.units; 
+        getWeatherData(locationData, units).then((weatherData) => {
+          if (!weatherData) {
+            // Alert user
+            alert(`Could get weather data for ${locationData.name}.`)
+            console.log(`Could get weather data for ${locationData.name}.`)
+            return; 
+          }
+          // Update map location and match the background tot the weather
+          changeMapLocation(weatherData);  
+          changeBackgroundAccordingToWeather(weatherData); 
+          // Save weather data for later use
+          setExistingWeatherData(weatherData);
+        });
+      });
+      
+      // Add functionality to the mobile search bar
+      document.getElementById("search-form-mobile").addEventListener("submit", async (event) => {
+        event.preventDefault(); 
+        const searchForm = document.getElementById("search-form-mobile");
+        const mainContent = document.querySelector('main');  
+        // Load weather data
+        const locationData = { name: document.getElementById("search-input").value.trim().toLowerCase() };
+        const settings = await getSettings(); 
+        const units = settings.units; 
+        // Get weather data
+        getWeatherData(locationName, units).then((weatherData) => {
+          if (!weatherData) {
+            // Alert user
+            alert(`Could get weather data for ${locationName}.`)
+            console.log(`Could get weather data for ${locationName}.`)
+            return; 
+          }
+          // Update map location and match the background tot the weather
+          changeMapLocation(weatherData);  
+          changeBackgroundAccordingToWeather(weatherData); 
+          // Save weather data for later use
+          setExistingWeatherData(weatherData);
+        }).then(() => {
+          // Show results
+          searchForm.classList.remove("open"); 
+          mainContent.classList.remove("hidden"); 
+        });
+      });
     </script>
 </body>
 </html>

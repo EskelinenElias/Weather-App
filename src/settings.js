@@ -3,12 +3,29 @@ function setSettings(units) {
     units: units
   }
   localStorage.setItem("settings", JSON.stringify(settings)); 
+  // Update weather data for new units
+  getExistingWeatherData().then((locationData) => { 
+    if (locationData) {
+      getWeatherData(locationData, units).then((weatherData) => { 
+        if (weatherData) {
+          setExistingWeatherData(weatherData); 
+        }
+      });
+    }
+  });
 }
 
 async function getSettings() {
-  return await localStorage.getItem("settings").then((json) => {
-    return JSON.parse(json);
-  }).catch((error) => { 
+  try {
+    return await JSON.parse(localStorage.getItem("settings"));
+  } catch(error) {
     console.log(error); 
-  });
+  } 
 }
+
+// Set default settings
+getSettings().then((settings) => { 
+  if (!settings) {
+    setSettings("metric")
+  }
+}); 

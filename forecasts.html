@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Weather App</title>
+        <!-- JavaScripts -->
+        <script src="src/settings.js"></script>
+        <script src="src/header.js"></script>
+        <script src="src/geolocation.js"></script>
+        <script src="src/background.js"></script>
+        <script src="src/weather.js"></script>
+        <script src="src/forecasts.js"></script>
+        <!-- Frappe charts -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-charts/dist/frappe-charts.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/frappe-charts@1.2.4/dist/frappe-charts.min.iife.js"></script>
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="stylesheets/styles.css">
+        <link rel="stylesheet" href="stylesheets/header.css">
+        <link rel="stylesheet" href="stylesheets/forecasts.css">
+        <!-- Font Awesome icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    </head>
+    <body> 
+        <!-- Backgrounds container-->
+        <div class="background-container">
+            <div class="background background1"></div>
+            <div class="background background2"></div>
+        </div>
+        <!-- Navigation bar -->
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <div class="logo">
+                        <h1><a href="index.html">Weather App</a></h1>
+                    </div>
+                    <div class="nav-items"> 
+                        <!-- Navigation and search for desktop -->
+                        <button class="nav-button" id="home-button">Home</button>
+                        <button class="nav-button" id="map-button">Map</button>
+                        <button class="nav-button" id="about-button">About</button>
+                        <form id="search-form" class="search-form">
+                            <input type="text" id="search-input" placeholder="Enter city name" required>
+                        </form>
+                        <!-- Search icon and overflow menu icon for mobile -->
+                        <button class="icon-button" id="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="icon-button" id="overflow-menu">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            <!-- Hidden search bar for mobile -->
+            <form id="search-form-mobile" class="search-form">
+                <input type="text" id="search-input-mobile" placeholder="Enter city name" required>
+            </form>
+            <!-- Hidden overflow menu for mobile -->
+            <div class="overflow-menu-dropdown" id="overflow-menu-dropdown">
+                <button class="nav-button" id="dropdown-home-button">Home</button>
+                <button class="nav-button" id="dropdown-map-button">Map</button>
+                <button class="nav-button" id="dropdown-about-button">About</button>
+            </div>
+        </header>
+        <!-- Main content -->
+        <main>
+            <h1 id="forecasts-header">Forecasts</h1>
+            <div class="forecast-content" id="forecast-content">
+                <div class="forecast-view" id="forecast-view">
+                    <h2>Hourly forecast:</h2>
+                    <div class="forecast-container" id="hourly-forecast-container"></div>
+                    <h2>Daily forecast:</h2>
+                    <div class="forecast-container" id="daily-forecast-container" ></div>
+                </div>
+                <div class="forecast-view" id="chart-view">
+                    <h2>24 hour temperature chart:</h2>
+                    <div class="chart-container" id="temp-chart" >
+                </div>
+            </div>
+        </main>
+        <!-- Settings button -->
+        <button class="icon-button" id="settings-button">
+            <i class="fas fa-cog"></i>
+        </button>
+        <!-- Locate button -->
+        <button class="icon-button" id="locate-button">
+            <i class="fas fa-location-arrow"></i>
+        </button>
+        <!-- Page specific JavaScripts -->
+        <script>
+          // Add functionality to the map-page button
+          document.getElementById("home-button").addEventListener("click", function() {
+            window.location.href = "index.html";
+          });
+          
+          // Add functionality to the about-page button
+          document.getElementById("about-button").addEventListener("click", function() {
+            window.location.href = "about.html";
+          });
+          
+          // Add functionality to the map-page button
+          document.getElementById("map-button").addEventListener("click", function() {
+            window.location.href = "map.html";
+          });
+          
+          // Add functionality to the overflow menu home-page button
+          document.getElementById("dropdown-home-button").addEventListener("click", function() {
+            window.location.href = "index.html";
+          });
+          
+          // Add functionality to the overflow menu home-page button
+          document.getElementById("dropdown-map-button").addEventListener("click", function() {
+            window.location.href = "map.html";
+          });
+          
+          // Add functionality to the overflow menu about-page button
+          document.getElementById("dropdown-about-button").addEventListener("click", function() {
+            window.location.href = "about.html";
+          });
+          
+          // Add functionality to the settings button
+          document.getElementById("settings-button").addEventListener('click', () => {
+            window.location.href = "settings.html";
+          });
+          
+          // Add functionality to the locate button
+          document.getElementById("locate-button").addEventListener('click', () => {
+            event.preventDefault(); 
+            // Get weather data for the current location
+            getWeatherDataForCurrentLocation().then((weatherData) => {
+              if (!weatherData) {
+                // Alert user
+                alert("Could not get weather data for current location.")
+                return; 
+              }
+              document.getElementById("forecasts-header").innerText = `Forecasts for ${weatherData.name}`;
+              // Display weather data and update background to match the weather
+              displayWeatherData(weatherData); 
+              changeBackgroundAccordingToWeather(weatherData); 
+              // Save weather data for later use
+              setExistingWeatherData(weatherData); 
+            });
+          });
+          
+          // Add functionality to the mobile search bar
+          document.getElementById("search-form-mobile").addEventListener("submit", async (event) => {
+            event.preventDefault(); 
+            const locationData = {name:document.getElementById("search-input-mobile").value}; 
+            const searchForm = document.getElementById("search-form-mobile");
+            const mainContent = document.querySelector('main'); 
+            const settings = getSettings(); 
+            getWeatherData(locationData, settings.units).then((weatherData) => {
+              if (!weatherData) { 
+                alert(`Could not get weather data for search ${locationData.name}`)
+                console.log(`Could not get weather data for search ${locationData.name}`)
+                return; 
+              }
+              document.getElementById("forecasts-header").innerText = `Forecasts for ${locationData.name}`;
+              setExistingWeatherData(weatherData); 
+              changeBackgroundAccordingToWeather(weatherData); 
+            }).then((locationData) => {
+              // Get forecast data
+              getHourlyForecastData(locationData, units).then((forecastData) => {
+                if (!forecastData) {
+                  alert(`Could not get forecast data for search ${locationData.name}`)
+                  console.log(`Could not get forecast data for search ${locationData.name}`)
+                  return; 
+                }
+                // Display forecast data
+                displayHourlyForecastData(forecastData); 
+                displayDailyForecastData(forecastData);  
+              });
+              getOtherHourlyForecast(locationData, 2, units).then((forecastData) => {
+                if (!forecastData) {
+                  alert(`Could not get forecast data for search ${locationData.name}`)
+                  console.log(`Could not get forecast data for search ${locationData.name}`)
+                  return; 
+                }
+                // Plot forecast data
+                const data = create24HourForecastForPlot(forecastData, units); 
+                plot24HourForecast(data, units);
+              });
+            });
+            // Show results
+            searchForm.classList.remove("open"); 
+            mainContent.classList.remove("hidden"); 
+          });
+          
+          // Add functionality to the desktop search bar
+          document.getElementById("search-form").addEventListener("submit", async (event) => {
+            event.preventDefault(); 
+            // 
+            const locationData = { name: document.getElementById("search-input").value.trim().toLowerCase() }; 
+            const settings = await getSettings(); 
+            const units = settings.units; 
+            getWeatherData(locationData, units).then((weatherData) => {
+              if (!weatherData) { 
+                alert(`Could not get weather data for search ${locationData.name}`)
+                console.log(`Could not get weather data for search ${locationData.name}`)
+                return; 
+              }
+              document.getElementById("forecasts-header").innerText = `Forecasts for ${locationData.name}`;
+              // Change background style according to weather
+              changeBackgroundAccordingToWeather(weatherData); 
+              // Store weather data for later use
+              setExistingWeatherData(weatherData); 
+              return locationData; 
+            }).then((locationData) => {
+              // Get forecast data
+              console.log("units", units)
+              getHourlyForecastData(locationData, 24, units).then((forecastData) => {
+                if (!forecastData) {
+                  alert(`Could not get forecast data for search ${locationData.name}`)
+                  console.log(`Could not get forecast data for search ${locationData.name}`)
+                  return; 
+                }
+                // Display forecast data
+                displayHourlyForecastData(forecastData); 
+                displayDailyForecastData(forecastData);  
+              });
+              getOtherHourlyForecast(locationData, 2, units).then((forecastData) => {
+                if (!forecastData) {
+                  alert(`Could not get forecast data for search ${locationData.name}`)
+                  console.log(`Could not get forecast data for search ${locationData.name}`)
+                  return; 
+                }
+                // Plot forecast data
+                const data = create24HourForecastForPlot(forecastData, units); 
+                plot24HourForecast(data, units);
+              }).catch((error) => {
+                alert(`Could not get forecast data for search ${locationData.name}`)
+                console.log(`An error occurred when attempting to get other forecast data with search ${locationData.name}`, error);
+                return; 
+              });
+            }); 
+          });
+        </script>
+    </body>
+</html>

@@ -32,32 +32,32 @@ document.addEventListener("DOMContentLoaded", () => {
       attribution: '© OpenStreetMap contributors & CartoDB'
     })
     // Add clouds
-    const cloudsLayer = L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${APIKey}`, {
+    const cloudsLayer = L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Clouds data © OpenWeatherMap'
     });
     // Add rain
-    const precipitationLayer = L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${APIKey}`, {
+    const precipitationLayer = L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Precipitation data © OpenWeatherMap'
     });
     // Add temperature
-    const tempLayer = L.tileLayer(`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${APIKey}`, {
+    const tempLayer = L.tileLayer(`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Temperature data © OpenWeatherMap'
     });
     // Add wind
-    const windLayer = L.tileLayer(`https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${APIKey}`, {
+    const windLayer = L.tileLayer(`https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Wind data © OpenWeatherMap'
     });
     // Add pressure
-    const pressureLayer = L.tileLayer(`https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${APIKey}`, {
+    const pressureLayer = L.tileLayer(`https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Pressure data © OpenWeatherMap'
     });
     // Add snow
-    const snowLayer = L.tileLayer(`https://tile.openweathermap.org/map/snow_new/{z}/{x}/{y}.png?appid=${APIKey}`, {
+    const snowLayer = L.tileLayer(`https://tile.openweathermap.org/map/snow_new/{z}/{x}/{y}.png?appid=${OWM_APIKey}`, {
       maxZoom: 19,
       attribution: 'Snow data © OpenWeatherMap'
     });

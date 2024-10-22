@@ -7,7 +7,6 @@ async function getLocation() {
           console.log("No position")
         }
         const coordinates = position.coords;
-        setExistingLocationData(coordinates); 
         resolve(coordinates);
       }, (error) => {
         reject(error);
@@ -16,6 +15,10 @@ async function getLocation() {
       reject(new Error('Geolocation is not supported by your browser'));
     }
   }); 
+}
+
+function getDefaultLocation() {
+  return getCoordinates("Helsinki");
 }
 
 // Function for getting the relevant location data, usually when DOM content is loaded
@@ -49,13 +52,3 @@ async function getRelevantLocationData() {
     console.log(error)
   }
 }
-
-/* 
-async function getExistingLocationData() {
-  return await JSON.parse(sessionStorage.getItem("locationData"));  
-}
-
-function setExistingLocationData(locationData) {
-  sessionStorage.setItem("locationData", JSON.stringify(locationData)); 
-}
-*/

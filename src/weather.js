@@ -1,155 +1,212 @@
-const APIKey = "2b255ed685e131c7835a144acfc6ca6f";
+// OpenWeatherMap API key
+const OWM_APIKey = "2b255ed685e131c7835a144acfc6ca6f";
+// WeatherAPI API key
+const WeatherAPIKey = "e927b27f8fca4fb580082119242210";
 
-function getWeather(event) {
-  event.preventDefault();
-  const city = document.getElementById("search-input").value.trim().toLowerCase();
-  if (city === "") {
-    //displayError("Please enter a city name.");
-    //return;
-    city = "Helsinki"; 
+// Function for getting weather data for the current location of the user
+async function getWeatherDataForCurrentLocation(units) {
+  if (!units) {
+    const settings = await getSettings();
+    units = settings.units; 
   }
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${APIKey}&units=metric`;
-
-  fetch(apiUrl)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("City not found");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data); 
-      displayWeatherData(data);
-    })
-    .catch((error) => {
-      console.log("Error occurred", error); 
-      //displayError(error.message);
-    });
-}
-
-async function getWeatherByLocationName(locationName) {
-  locationName = locationName.trim().toLowerCase(); 
-  if (!locationName) {
-    return; 
-  }
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${locationName}&appid=${APIKey}&units=metric`;
-  return await fetch(apiUrl).then((response) => {
-    if (!response.ok) {
-      throw new Error(`City ${cityName} not found`);
-    }
-    return response.json();
-  }).then((weatherData) => {
-    if (weatherData) {
-      const locationData = {
-        name: locationName,
-        latitude: weatherData.coord.lat,
-        longitude: weatherData.coord.lon
-      }
-      setExistingWeatherData(weatherData); 
-      return weatherData;
-    }
+  return await getLocation().then((locationData) => { 
+    if (!locationData) { throw new Error("Could not get location data.") }
+    return getWeatherData(locationData, units);
   }).catch((error) => {
-    console.log("Error occurred", error); 
-  });
+    console.log(error);
+  }); 
 }
 
-async function getWeatherDataForLocation(locationData) {
-  if (!locationData) {
-    return; 
+// Function for getting the default weather data
+async function getDefaultWeatherData(units) {
+  if (!units) {
+    const settings = await getSettings();
+    units = settings.units; 
   }
-  const latitude = locationData.latitude || locationData.coords.latitude; 
-  const longitude = locationData.longitude || locationData.coords.longitude;
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${APIKey}&units=metric`;
-  return await fetch(url).then((response) => {
-    if (!response.ok) {
-      throw new Error(`Weather data for coordinates ${latitude}, ${longitude} not found.`);
-    }
-    return response.json();
-  }).then((data) => {
-    return data;
-  }).catch((error) => {
-    console.log("Error occurred", error); 
-  });
+  const locationData = { name: "Helsinki" }
+  return getWeatherData(locationData, units);
 }
 
+// Function that returns the most relevant weather data quickly, usually for loading page content
 async function getRelevantWeatherData() {
   return await getExistingWeatherData().then((weatherData) => {
     if (weatherData) {
       return weatherData;
     }
-    return getLocation().then((locationData) => {
-      if (locationData) {
-        let weatherData = getWeatherDataForLocation(locationData); 
-        if (weatherData) {
-          setExistingLocationData(locationData); 
-          setExistingWeatherData(weatherData); 
-          return weatherData; 
-        }
+    return getWeatherDataForCurrentLocation().then((weatherData) => {
+      if (weatherData) {
+        setExistingWeatherData(weatherData);
+        return weatherData;
       }
-      getCoordinates("Helsinki").then((locationData) => {
-        getWeatherDataForLocation(locationData).then((weatherData) => {
-          setExistingLocationData(locationData);
-          setExistingWeatherData(weatherData);
-          return weatherData;
-        })
-      });
+      return getDefaultWeatherData(); 
     });
   });
 }
-async function fetchWeatherDataByCoordinates(coordinates) {
-  if (!coordinates) {
-    return; 
-  }
-  const latitude = coordinates.latitude; 
-  const longitude = coordinates.longitude; 
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${APIKey}&units=metric`;
-  return await fetch(url).then((response) => {
-    if (!response.ok) {
-      throw new Error(`Weather data for coordinates ${latitude}, ${longitude} not found.`);
-    }
+
+// Function for parsing location data for API calls
+function parseLocationData(locationData) {
+  if (locationData.lat && locationData.lon || locationData.latitude && locationData.longitude) {
+    const latitude = locationData.lat || locationData.latitude;
+    const longitude = locationData.lon || locationData.longitude;
+    return `lat=${latitude}&lon=${longitude}`; 
+  } else if (locationData.coord || locationData.coords) {
+    const coordinates = locationData.coord || locationData.coords;
+    const latitude = coordinates.lat || coordinates.latitude;
+    const longitude = coordinates.lon || coordinates.longitude; 
+    return `lat=${latitude}&lon=${longitude}`; 
+  } else if (locationData.name || locationData.cityName) {
+    const cityName = locationData.name || locationData.cityName; 
+    return `q=${cityName}`; 
+  } 
+  throw new Error("Could not parse location data.")
+}
+
+// Function for fetching weather data
+async function getWeatherData(locationData, units) {
+  if (!locationData) { throw new Error("Location data was not provided."); }
+  // Parse location data 
+  const location = parseLocationData(locationData);
+  // Construct URL
+  const url = `https://api.openweathermap.org/data/2.5/weather?${location}&appid=${OWM_APIKey}&units=${units}`;
+  // Fetch weather data
+  return fetch(url).then((response) => {
+    if (!response.ok) { throw new Error('Failed to fetch weather data.'); }
     return response.json();
   }).then((data) => {
+    if (!data) { throw new Error('Failed to parse weather data.'); }
     return data;
-  }).catch((error) => {
-    console.log("Error occurred", error); 
   });
 }
 
+// Function for fetching hourly forecast data
+async function getHourlyForecastData(locationData, numItems, units) {
+  if (!locationData) { throw new Error("Location data was not provided."); }
+  // Parse location data 
+  const location = parseLocationData(locationData); 
+  // Construct URL
+  const url = `https://api.openweathermap.org/data/2.5/forecast?${location}&cnt${numItems}&appid=${OWM_APIKey}&units=${units}`;
+  // Fetch forecast data
+  return fetch(url).then((response) => { 
+    if (!response.ok) { throw new Error('Failed to fetch hourly forecast data'); }
+    return response.json();
+  }).then((data) => { 
+    if (!data) { throw new Error('Failed to parse hourly forecast data'); }
+    return data; 
+  }); 
+}
 
-// Function to map OpenWeatherMap weather codes to Font Awesome icons
-function getWeatherIcon(weatherCode, size = 'fa-3x') { // Default size is 'fa-3x'
+// Function for fetching daily forecast data
+async function getDailyForecastData(locationData, numDays, units) {
+  if (!locationData) { throw new Error("Location data was not provided."); }
+  // Parse location data 
+  const location = parseLocationData(locationData); 
+  // Construct URL
+  const url = `https://api.openweathermap.org/data/2.5/forecast?${location}&cnt${numDays}&appid=${OWM_APIKey}&units=${units}`;
+  // Fetch daily forecast data
+  return fetch(url).then((response) => { 
+    if (!response.ok) { throw new Error('Failed to fetch daily forecast data'); }
+    return response.json();
+  }).then((data) => { 
+    if (!data) { throw new Error('Failed to parse daily forecast data'); }
+    return data; 
+  }); 
+}
+
+// Parse location data for Weather API calls
+function parseLocationDataOther(locationData) {
+  if (locationData.lat && locationData.lon || locationData.latitude && locationData.longitude) {
+    const latitude = locationData.lat || locationData.latitude;
+    const longitude = locationData.lon || locationData.longitude;
+    return `q=${latitude},${longitude}`; 
+  } else if (locationData.coord || locationData.coords) {
+    const coordinates = locationData.coord || locationData.coords;
+    const latitude = coordinates.lat || coordinates.latitude;
+    const longitude = coordinates.lon || coordinates.longitude; 
+    return `q=${latitude},${longitude}`; 
+  } else if (locationData.name || locationData.cityName) {
+    const cityName = locationData.name || locationData.cityName; 
+    return `q=${cityName}`; 
+  } 
+  throw new Error("Could not parse location data.")
+}
+
+// Function for getting the units in Weather API format
+function chooseUnitsOther(units) {
+  if (units === "imperial") { return "f"; } 
+  else { return "c"; }
+}
+
+// Function for getting hourly forecast data from Weather API
+async function getOtherHourlyForecast(locationData, days, units) {
+  if (!locationData) { throw new Error("Location data was not provided."); }
+  // Parse location data 
+  const location = parseLocationDataOther(locationData); 
+  // Choose units
+  const unit = chooseUnitsOther(units); 
+  // Construct URL
+  const url = `http://api.weatherapi.com/v1/forecast.json?key=${WeatherAPIKey}&${location}&days=${days}`
+  // Fetch forecast data    const data = await response.json();
+  return fetch(url).then((response) => {
+    if (!response.ok) { throw new Error('Failed to fetch hourly forecast data from Weather API.'); }
+    return response.json();
+  }).then((data) => {
+    if (!data) { throw new Error('Failed to parse hourly forecast data from Weather API.'); }
+    return data;
+  }); 
+}
+
+// Function to map weather code or condition to Font Awesome icons
+function getWeatherIcon(input, size = 'fa-3x') {
   let iconCode;
-  if (weatherCode >= 200 && weatherCode < 300) {
-    // Thunderstorm
-    iconCode = `fas fa-bolt ${size}`; // Lightning bolt
-  } else if (weatherCode >= 300 && weatherCode < 400) {
-    // Drizzle
-    iconCode = `fas fa-cloud-rain ${size}`; // Cloud with rain
-  } else if (weatherCode >= 500 && weatherCode < 600) {
-    // Rain
-    iconCode = `fas fa-cloud-showers-heavy ${size}`; // Heavy rain
-  } else if (weatherCode >= 600 && weatherCode < 700) {
-    // Snow
-    iconCode = `fas fa-snowflake ${size}`; // Snowflake
-  } else if (weatherCode >= 700 && weatherCode < 800) {
-    // Atmosphere (e.g., mist, fog, smoke)
-    iconCode = `fas fa-smog ${size}`; // Fog/smog
-  } else if (weatherCode === 800) {
-    // Clear sky
-    iconCode = `fas fa-sun ${size}`; // Sun
-  } else if (weatherCode > 800 && weatherCode < 900) {
-    // Clouds
-    iconCode = `fas fa-cloud ${size}`; // Cloudy
+
+  if (typeof input === 'number') {
+    // Handle weather codes
+    if (input >= 200 && input < 300) {
+      iconCode = `fas fa-bolt ${size}`; // Thunderstorm
+    } else if (input >= 300 && input < 400) {
+      iconCode = `fas fa-cloud-rain ${size}`; // Drizzle
+    } else if (input >= 500 && input < 600) {
+      iconCode = `fas fa-cloud-showers-heavy ${size}`; // Rain
+    } else if (input >= 600 && input < 700) {
+      iconCode = `fas fa-snowflake ${size}`; // Snow
+    } else if (input >= 700 && input < 800) {
+      iconCode = `fas fa-smog ${size}`; // Atmosphere
+    } else if (input === 800) {
+      iconCode = `fas fa-sun ${size}`; // Clear sky
+    } else if (input > 800 && input < 900) {
+      iconCode = `fas fa-cloud ${size}`; // Clouds
+    } else {
+      iconCode = `fas fa-question ${size}`; // Unknown
+    }
+  } else if (typeof input === 'string') {
+    // Handle weather conditions as strings
+    if (input.toLowerCase() === 'clear') {
+      iconCode = `fas fa-sun ${size}`;
+    } else if (input.toLowerCase() === 'thunderstorm') {
+      iconCode = `fas fa-bolt ${size}`;
+    } else if (input.toLowerCase() === 'drizzle') {
+      iconCode = `fas fa-cloud-rain ${size}`;
+    } else if (input.toLowerCase() === 'rain') {
+      iconCode = `fas fa-cloud-showers-heavy ${size}`;
+    } else if (input.toLowerCase() === 'snow') {
+      iconCode = `fas fa-snowflake ${size}`;
+    } else if (input.toLowerCase() === 'atmosphere') {
+      iconCode = `fas fa-smog ${size}`;
+    } else if (input.toLowerCase() === 'clouds') {
+      iconCode = `fas fa-cloud ${size}`;
+    } else {
+      iconCode = `fas fa-question ${size}`; // Unknown
+    }
   } else {
-    // Default: Unknown weather condition
-    iconCode = `fas fa-question ${size}`; // Question mark
+    // Default case for unknown input
+    iconCode = `fas fa-question ${size}`;
   }
   return iconCode;
 }
 
 async function getCoordinates(locationName) {
   if (!locationName) { return; }
-  return await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${locationName}&limit=1&appid=${APIKey}`)
+  return await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${locationName}&limit=1&appid=${OWM_APIKey}`)
   .then(response => response.json())
   .then(data => {
     if (data && data.length > 0) {

@@ -1,14 +1,19 @@
 header {
+    margin: 0px; 
+    padding: 0px;
     width: 100%; 
     color: var(--header-text-color);
-    opacity: 0.9; 
     z-index: 1000;
-    position: relative;
+    position: fixed;
+    top: 0; 
+    left: 0;
+    right: 0; 
     transition: var(--elements-transition); 
 }
 
 .logo {
-    margin: 0;
+    margin: 0px;
+    padding: 0px; 
     font-size: 1.5rem;
 }
 
@@ -52,7 +57,7 @@ header {
 }
 
 .nav-button:hover {
-    color: gray; /* Optional: Change color on hover */
+    color: gray; 
 }
 
 .search-form {
@@ -60,17 +65,137 @@ header {
     color: inherit; 
 }
 
-.search-form input {
+#search-form input {
     padding: 0.5rem;
-    background-color: var(--search-form-background-color); /* Translucent white background */
-    border: 1px solid var(--header-text-color); /* 1px solid white border */
+    background-color: var(--search-form-background-color);
+    border: 1px solid var(--header-text-color);
     border-radius: 5px; 
     outline: none;
     color: inherit;
     transition: var(--search-form-transition); 
 }
 
-.search-form input#search-input::placeholder {
+#search-form-mobile {
+    display: none; 
+}
+
+#search-form input::placeholder {
     color: var(--search-form-placeholder-color);
     transition: var(--search-form-transition); 
+}
+
+.overflow-menu-dropdown {
+    display: none;
+}
+
+header .icon-button {
+    display: none;
+}
+
+main {
+    opacity: 1;
+    transition: opacity 0.3s ease; 
+}
+
+main.hidden {
+    opacity: 0; 
+}
+
+
+
+@media only screen and (max-width: 600px) {
+    header {
+        padding: 0px; 
+        margin: 0px; 
+    }
+    
+    .logo {
+        font-size: 1.0rem;
+    }
+    
+    .nav-items .nav-button,
+    .search-form {
+        display: none;
+    }
+    
+    header .icon-button {
+        display: inline-block;
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 10px; 
+    }
+    
+    #search-form-mobile {
+        display: flex; 
+        margin-left: 20px; 
+        margin-right: 20px; 
+        opacity: 0; 
+        transition: var(--search-form-transition); 
+    }
+        
+    #search-form-mobile.open {
+        color: inherit;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out  
+    }
+
+    #search-form-mobile.open input {
+        width: 100%; 
+        background-color: var(--search-form-background-color);
+        border: 1px solid var(--header-text-color);
+        border-radius: 5px; 
+        outline: none; 
+        margin: 0px;
+        padding: 10px; 
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    
+    #search-form-mobile.open input::placeholder {
+        color: var(--search-form-placeholder-color); 
+    }
+    
+    .overflow-menu-dropdown {
+        display: flex; 
+        position: absolute;
+        right: 20px;
+        flex-direction: column;
+        background-color: var(--overflow-menu-background-color);
+        border: 1px solid var(--header-text-color);
+        border-radius: 5px;
+        color: var(--overflow-menu-text-color);
+        padding: 0px;
+        margin: 0px; 
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0; 
+        pointer-events: none; 
+    }
+    
+    .overflow-menu-dropdown.open {
+        opacity: 1; 
+        transition: opacity 0.3s ease-in-out; 
+        pointer-events: auto; 
+    }
+    
+    .overflow-menu .fa-ellipsis-v {
+        font-size: 24px;
+        color: white;
+    }
+    
+    .overflow-menu-dropdown .nav-button {
+        padding: 10px;
+        margin: 5px 0;
+        text-align: left;
+        width: 100%;
+        background-color: transparent;
+        border: none;
+        font-size: 16px;
+    }
+    
+    .overflow-menu-dropdown .nav-button:hover {
+        color: var(--overflow-menu-text-color-hover);
+    }
 }
